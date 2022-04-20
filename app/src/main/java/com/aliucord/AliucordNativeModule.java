@@ -20,12 +20,12 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
     private final File PLUGINS_DIR = new File(ALIUCORD_DIR, "plugins");
     private final File THEMES_DIR = new File(ALIUCORD_DIR, "themes");
 
-    private final CatalystInstance catalyst;
     private final Map<String, String> manifestCache = new HashMap<>();
+    private final ReactApplicationContext appContext;
 
     public AliucordNativeModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        catalyst = reactContext.getCatalystInstance();
+        appContext = reactContext;
     }
 
     @Override
@@ -143,6 +143,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
 
         var errors = Arguments.createMap();
         try {
+            var catalyst = appContext.getCatalystInstance();
             var loadScriptFromFile = CatalystInstanceImpl.class.getDeclaredMethod("jniLoadScriptFromFile", String.class, String.class, boolean.class);
             loadScriptFromFile.setAccessible(true);
 
@@ -197,7 +198,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void listNativeModules(Promise p) {
         var ret = Arguments.createMap();
-        for (var module : catalyst.getNativeModules()) {
+        for (var module : appContext.getCatalystInstance().getNativeModules()) {
             var methods = Arguments.createArray();
 
             for (var method : module.getClass().getDeclaredMethods()) {

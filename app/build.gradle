@@ -3,6 +3,10 @@ plugins {
     id 'com.aliucord.gradle'
 }
 
+aliucord {
+    projectType.set(com.aliucord.gradle.ProjectType.INJECTOR)
+}
+
 android {
     compileSdk 31
 
