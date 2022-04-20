@@ -30,7 +30,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "AliucordFS";
+        return "AliucordNative";
     }
 
     private void rejectEnoent(Promise p, File file) {
