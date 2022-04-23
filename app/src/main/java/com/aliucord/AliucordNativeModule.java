@@ -6,7 +6,15 @@
 
 package com.aliucord;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Base64;
 
 import com.facebook.react.bridge.*;
@@ -15,7 +23,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class AliucordNativeModule extends ReactContextBaseJavaModule {
+@SuppressWarnings("unused")
+public class AliucordNativeModule extends ReactContextBaseJavaModule implements ActivityEventListener {
     private final File ALIUCORD_DIR = new File(Environment.getExternalStorageDirectory(), "AliucordRN");
     private final File SETTINGS_DIR = new File(ALIUCORD_DIR, "settings");
     private final File PLUGINS_DIR = new File(ALIUCORD_DIR, "plugins");
@@ -285,4 +294,61 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
             p.reject(ex);
         }
     }
+
+    Promise permissionResult;
+    private static final int PERMISSION_REQUEST_CODE = 9090;
+
+    @SuppressLint("NewApi")
+    @ReactMethod
+    public void requestPermissions(Promise p) {
+        if (checkPermissionsInternal()) {
+            p.resolve(true);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            permissionResult = p;
+            appContext.addActivityEventListener(this);
+
+            var activity = getCurrentActivity();
+            try {
+                activity.startActivityForResult(
+                    new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + appContext.getPackageName())),
+                    PERMISSION_REQUEST_CODE
+                );
+            } catch (Exception e) {
+                activity.startActivityForResult(
+                    new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION),
+                    PERMISSION_REQUEST_CODE
+                );
+            }
+        } else {
+            permissionResult = p;
+            appContext.addActivityEventListener(this);
+
+            getCurrentActivity().requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @ReactMethod
+    public void checkPermissions(Promise p) {
+        p.resolve(checkPermissionsInternal());
+    }
+
+    private boolean checkPermissionsInternal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return appContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(Activity activity, int request, int result, Intent intent) {
+        if (request != PERMISSION_REQUEST_CODE || permissionResult == null) return;
+        permissionResult.resolve(checkPermissionsInternal());
+        permissionResult = null;
+        appContext.removeActivityEventListener(this);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {}
 }
