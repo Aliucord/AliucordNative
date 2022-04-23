@@ -7,6 +7,7 @@
 package com.aliucord;
 
 import android.os.Environment;
+import android.util.Base64;
 
 import com.facebook.react.bridge.*;
 
@@ -58,10 +59,10 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
         return true;
     }
 
-    private String readText(File file) throws IOException {
+    private byte[] readBytes(File file) throws IOException {
         long size = file.length();
         if ((int) size != size) throw new IOException("Wow that file is kinda too big buddy...");
-        else if (size == 0) return "";
+        else if (size == 0) return new byte[0];
 
         var bytes = new byte[(int) size];
         try (var is = new FileInputStream(file)) {
@@ -69,12 +70,16 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
             is.read(bytes);
         }
 
-        return new String(bytes);
+        return bytes;
     }
 
-    private void writeText(File file, String text) throws IOException {
+    private String readText(File file) throws IOException {
+        return new String(readBytes(file));
+    }
+
+    private void writeText(File file, byte[] bytes) throws IOException {
         try (var os = new FileOutputStream(file)) {
-            os.write(text.getBytes(StandardCharsets.UTF_8));
+            os.write(bytes);
         }
     }
 
@@ -88,7 +93,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initAliucordDirs(Promise p) {
-        for (var dir : new File[] { ALIUCORD_DIR, PLUGINS_DIR, SETTINGS_DIR, THEMES_DIR }) {
+        for (var dir : new File[]{ALIUCORD_DIR, PLUGINS_DIR, SETTINGS_DIR, THEMES_DIR}) {
             if (!dir.exists() && !dir.mkdir()) {
                 p.reject("ENOENT", "Failed to create Aliucord dirs");
                 return;
@@ -110,28 +115,41 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void readFile(String path, Promise p) {
-        var file = new File(path);
-        if (!checkFile(file, p)) return;
-
+    public void readFile(String path, String encoding, Promise p) {
         try {
-            p.resolve(readText(file));
-        } catch (IOException ex) {
+            var file = new File(path);
+            if (!checkFile(file, p)) return;
+
+            var bytes = readBytes(file);
+            p.resolve("base64".equals(encoding) ? Base64.encode(bytes, Base64.DEFAULT) : new String(bytes));
+        } catch (Throwable ex) {
+            ex.printStackTrace();
             p.reject(ex);
         }
     }
 
     @ReactMethod
-    public void writeFile(String path, String newContent, Promise p) {
-        var file = new File(path);
-        if (!checkParent(file, p)) return;
-
+    public void writeFile(String path, String newContent, String encoding, Promise p) {
         try {
-            writeText(file, newContent);
+            var file = new File(path);
+            if (!checkParent(file, p)) return;
+
+            writeText(file, "base64".equals(encoding) ? Base64.decode(newContent, Base64.DEFAULT) : newContent.getBytes(StandardCharsets.UTF_8));
             p.resolve(true);
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
+            ex.printStackTrace();
             p.reject(ex);
         }
+    }
+
+    @ReactMethod
+    public void existsFile(String path, Promise p) {
+        p.resolve(new File(path).exists());
+    }
+
+    @ReactMethod
+    public void deleteFile(String path, Promise p) {
+        p.resolve(new File(path).delete());
     }
 
     @ReactMethod
@@ -164,8 +182,8 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
                     }
                 }
             }
-        } catch (ReflectiveOperationException ex) {
-            p.reject("EREFLECT", "Unexpected CatalystInstance");
+        } catch (Throwable ex) {
+            p.reject("ERR", "Unexpected CatalystInstance");
             return;
         }
 
@@ -193,6 +211,37 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
                 p.reject(ex);
             }
         }
+    }
+
+    private WritableMap manifests;
+
+    @ReactMethod
+    public void getAllManifests(Promise p) {
+        if (manifests == null) {
+            var map = Arguments.createMap();
+
+            var files = PLUGINS_DIR.listFiles();
+            if (files == null || files.length == 0) {
+                p.resolve(map);
+                return;
+            }
+
+            for (var file : files) {
+                var name = file.getName();
+                if (!name.endsWith(".manifest.json")) continue;
+                name = name.substring(0, name.length() - 14);
+                try {
+                    var text = readText(file);
+                    map.putString(name, text);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            manifests = map;
+        }
+
+        p.resolve(manifests);
     }
 
     @ReactMethod
@@ -230,7 +279,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule {
         var file = new File(SETTINGS_DIR, plugin + ".json");
 
         try {
-            writeText(file, newContent);
+            writeText(file, newContent.getBytes(StandardCharsets.UTF_8));
             p.resolve(true);
         } catch (IOException ex) {
             p.reject(ex);
