@@ -20,6 +20,7 @@ import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.ReactApplication;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
@@ -145,9 +146,6 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
         Activity plainActivity appContext.getCurrentActivity();
         if (plainActivity == null) return;
 
-        ((ReactApplication) getPlainActivity().getApplication())
-            .getReactNativeHost()
-            .getReactInstanceManager()
-            .showDevOptionsDialog();
+        ((ReactApplication) getPlainActivity().getApplication()).getReactNativeHost().getReactInstanceManager().showDevOptionsDialog();
     }
 }
