@@ -59,10 +59,6 @@ public class ResourceDrawableIdHelper {
     }
 
     public Drawable getResourceDrawable(Context context, String str) {
-        Drawable resourceDrawable = ImageOTAUtils.getResourceDrawable(context, str);
-        if (resourceDrawable != null) {
-            return resourceDrawable;
-        }
         int resourceDrawableId = getResourceDrawableId(context, str);
         if (resourceDrawableId > 0) {
             return context.getResources().getDrawable(resourceDrawableId);
@@ -71,10 +67,6 @@ public class ResourceDrawableIdHelper {
     }
 
     public Uri getResourceDrawableUri(Context context, String str) {
-        Uri resourceUri = ImageOTAUtils.getResourceUri(context, str);
-        if (resourceUri != null) {
-            return resourceUri;
-        }
         int resourceDrawableId = getResourceDrawableId(context, str);
         if (resourceDrawableId > 0) {
             return new Uri.Builder().scheme(LOCAL_RESOURCE_SCHEME).path(String.valueOf(resourceDrawableId)).build();
