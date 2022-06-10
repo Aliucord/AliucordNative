@@ -44,7 +44,7 @@ public class ResourceDrawableIdHelper {
         } catch (NumberFormatException unused) {
             synchronized (this) {
                 if (this.mResourceDrawableIdMap.containsKey(replace)) {
-                    return this.mResourceDrawableIdMap.get(replace);
+                    return this.mResourceDrawableIdMap.get(replace).intValue();
                 }
                 // ALIUCORD CHANGED: dynamic package name lookup -> BuildConfig.APPLICATION_ID
                 int identifier = context.getResources().getIdentifier(replace, "drawable", BuildConfig.APPLICATION_ID);
