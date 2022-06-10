@@ -139,4 +139,15 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
             p.reject(e);
         }
     }
+
+    @ReactMethod
+    public void openDevTools() {
+        Activity plainActivity appContext.getCurrentActivity();
+        if (plainActivity == null) return;
+
+        ((ReactApplication) getPlainActivity().getApplication())
+            .getReactNativeHost()
+            .getReactInstanceManager()
+            .showDevOptionsDialog();
+    }
 }
