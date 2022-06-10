@@ -146,6 +146,6 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
         Activity plainActivity = appContext.getCurrentActivity();
         if (plainActivity == null) return;
 
-        ((ReactApplication) getPlainActivity().getApplication()).getReactNativeHost().getReactInstanceManager().showDevOptionsDialog();
+        ((ReactApplication) plainActivity.getApplication()).getReactNativeHost().getReactInstanceManager().showDevOptionsDialog();
     }
 }
