@@ -143,7 +143,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
 
     @ReactMethod
     public void openDevTools() {
-        Activity plainActivity appContext.getCurrentActivity();
+        Activity plainActivity = appContext.getCurrentActivity();
         if (plainActivity == null) return;
 
         ((ReactApplication) getPlainActivity().getApplication()).getReactNativeHost().getReactInstanceManager().showDevOptionsDialog();
