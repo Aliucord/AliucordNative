@@ -36,7 +36,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public final void prepare(String s, String s1, int v, Callback callback) {
+    public final void prepare(String s, String s1, int v, Callback callback0) {
         r.g(s, "fileName");
         r.g(callback0, "callback");
         Log.i$default(Log.INSTANCE, "SoundManager", "Prepare " + s + " with " + v + ".", null, 4, null);
