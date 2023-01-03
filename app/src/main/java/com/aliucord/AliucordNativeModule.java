@@ -49,6 +49,7 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
         return new HashMap<>() {{
             put("externalStorageDirectory", Environment.getExternalStorageDirectory().getAbsolutePath());
             put("codeCacheDirectory", appContext.getCodeCacheDir().getAbsolutePath());
+            put("cacheDirectory", appContext.getCacheDir().getAbsolutePath());
             put("packageCodePath", appContext.getPackageCodePath());
         }};
     }
