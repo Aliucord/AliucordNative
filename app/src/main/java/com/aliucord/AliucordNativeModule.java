@@ -150,4 +150,13 @@ public class AliucordNativeModule extends ReactContextBaseJavaModule implements 
 
         ((ReactApplication) plainActivity.getApplication()).getReactNativeHost().getReactInstanceManager().showDevOptionsDialog();
     }
+
+    @ReactMethod
+    public void restartApp() {
+        Activity appActivity = appContext.getCurrentActivity();
+        var intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
+
+        appActivity.startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
+        System.exit(0);
+    }
 }
