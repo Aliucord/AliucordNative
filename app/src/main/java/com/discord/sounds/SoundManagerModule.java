@@ -7,14 +7,14 @@ import com.discord.logging.Log;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
-import kotlin.jvm.internal.r;
 
 public final class SoundManagerModule extends ReactContextBaseJavaModule {
     private final SoundManager soundManager;
 
     public SoundManagerModule(ReactApplicationContext reactApplicationContext0) {
         super(reactApplicationContext0);
-        r.g(reactApplicationContext0, "reactContext");
+        if(reactApplicationContext0 == null)
+            throw new NullPointerException("reactApplicationContext must not be null");
         this.soundManager = new SoundManager(reactApplicationContext0);
     }
 
@@ -37,8 +37,11 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public final void prepare(String s, String s1, int v, Callback callback0) {
-        r.g(s, "fileName");
-        r.g(callback0, "callback");
+        if(s == null)
+            throw new NullPointerException("s must not be null");
+        if(callback0 == null)
+            throw new NullPointerException("callback0 must not be null");
+
         Log.i$default(Log.INSTANCE, "SoundManager", "Prepare " + s + " with " + v + ".", null, 4, null);
         int v1 = 5;
         if(s1 != null) {
@@ -63,7 +66,9 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
         }
 
         ReactApplicationContext reactApplicationContext0 = this.getReactApplicationContext();
-        r.f(reactApplicationContext0, "reactApplicationContext");
+        if(reactApplicationContext0 == null)
+            throw new NullPointerException("reactApplicationContext must not be null");
+
         int v3 = SoundManagerModule.resolveRawResId$default(this, reactApplicationContext0, s, null, 2, null);
         com.discord.sounds.SoundManagerModule$prepare$1 soundManagerModule$prepare$10 = new com.discord.sounds.SoundManagerModule$prepare$1(callback0);
         this.soundManager.prepare(v, v1, v3, soundManagerModule$prepare$10);
