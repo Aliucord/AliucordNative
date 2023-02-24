@@ -10,7 +10,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import java.io.File;
-import kotlin.Unit;
+import kotlin.Metadata;
 import kotlin.jvm.internal.q;
 
 public final class SoundManagerModule extends ReactContextBaseJavaModule {
@@ -23,7 +23,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     }
 
     private final int resolveRawResId(Context context, String str, String str2) {
-	// ALIUCORD CHANGED: dynamic package name lookup -> BuildConfig.APPLICATION_ID
+        // ALIUCORD CHANGED: dynamic package name lookup -> BuildConfig.APPLICATION_ID
         int identifier = context.getResources().getIdentifier(str, str2, BuildConfig.APPLICATION_ID);
         if (identifier > 0) {
             return identifier;
@@ -47,7 +47,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void pause(int i10) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Pause " + i10, null, 4, null);
+        Log.i$default(log, logTag, "Pause " + i10, (Throwable) null, 4, (Object) null);
         this.soundManager.pause(i10);
     }
 
@@ -55,7 +55,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void play(int i10) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Play " + i10, null, 4, null);
+        Log.i$default(log, logTag, "Play " + i10, (Throwable) null, 4, (Object) null);
         this.soundManager.play(i10);
     }
 
@@ -65,7 +65,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
         String str2;
         q.g(fileName, "fileName");
         q.g(callback, "callback");
-        Log.i$default(Log.INSTANCE, SoundManager.Companion.getLogTag(), "Prepare " + fileName + " with " + i10 + ".", null, 4, null);
+        Log.i$default(Log.INSTANCE, SoundManager.Companion.getLogTag(), "Prepare " + fileName + " with " + i10 + ".", (Throwable) null, 4, (Object) null);
         int i11 = 5;
         if (str != null) {
             int hashCode = str.hashCode();
@@ -81,7 +81,6 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
                 i11 = 2;
             }
         }
-        int i12 = i11;
         if (URLUtil.isValidUrl(fileName)) {
             String remoteSoundFilename = SoundExtensionsKt.getRemoteSoundFilename(fileName);
             ReactApplicationContext reactApplicationContext = getReactApplicationContext();
@@ -90,10 +89,10 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
             if (!file.exists()) {
                 ReactApplicationContext reactApplicationContext2 = getReactApplicationContext();
                 q.f(reactApplicationContext2, "reactApplicationContext");
-                SoundExtensionsKt.fetchSound(reactApplicationContext2, fileName);
-            } else {
-                file.setLastModified(System.currentTimeMillis());
+                SoundExtensionsKt.fetchSound(reactApplicationContext2, fileName, this.soundManager, i10, i11, new SoundManagerModule$prepare$1(callback));
+                return;
             }
+            file.setLastModified(System.currentTimeMillis());
             str2 = file.getAbsolutePath();
             valueOf = null;
         } else {
@@ -102,14 +101,14 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
             valueOf = Integer.valueOf(resolveRawResId$default(this, reactApplicationContext3, fileName, null, 2, null));
             str2 = null;
         }
-        this.soundManager.prepare(i10, i12, valueOf, str2, new SoundManagerModule$prepare$1(callback));
+        this.soundManager.prepare(i10, i11, valueOf, str2, new SoundManagerModule$prepare$2(callback));
     }
 
     @ReactMethod
     public final void release(int i10) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Release " + i10, null, 4, null);
+        Log.i$default(log, logTag, "Release " + i10, (Throwable) null, 4, (Object) null);
         this.soundManager.release(i10);
     }
 
@@ -117,7 +116,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void setCurrentTime(int i10, int i11) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Set current time for " + i10 + " with value " + i11, null, 4, null);
+        Log.i$default(log, logTag, "Set current time for " + i10 + " with value " + i11, (Throwable) null, 4, (Object) null);
         this.soundManager.setCurrentTime(i10, i11);
     }
 
@@ -125,7 +124,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void setNumberOfLoops(int i10, int i11) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Set number of loops for " + i10 + " with value " + i11, null, 4, null);
+        Log.i$default(log, logTag, "Set number of loops for " + i10 + " with value " + i11, (Throwable) null, 4, (Object) null);
         this.soundManager.setNumberOfLoops(i10, i11);
     }
 
@@ -133,7 +132,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void setPan(int i10, int i11) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Set pan for " + i10 + " with value " + i11, null, 4, null);
+        Log.i$default(log, logTag, "Set pan for " + i10 + " with value " + i11, (Throwable) null, 4, (Object) null);
         this.soundManager.setPan(i10, (float) i11);
     }
 
@@ -141,7 +140,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void setVolume(int i10, float f10) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Set volume for " + i10 + " with value " + f10, null, 4, null);
+        Log.i$default(log, logTag, "Set volume for " + i10 + " with value " + f10, (Throwable) null, 4, (Object) null);
         this.soundManager.setVolume(i10, f10);
     }
 
@@ -149,7 +148,7 @@ public final class SoundManagerModule extends ReactContextBaseJavaModule {
     public final void stop(int i10) {
         Log log = Log.INSTANCE;
         String logTag = SoundManager.Companion.getLogTag();
-        Log.i$default(log, logTag, "Stop " + i10, null, 4, null);
+        Log.i$default(log, logTag, "Stop " + i10, (Throwable) null, 4, (Object) null);
         this.soundManager.stop(i10);
     }
 }
